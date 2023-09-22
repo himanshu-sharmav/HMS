@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Confirmation</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #555;
+        }
+        .appointment-details {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dfd2d2;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }   
+        .appointment-details h2 {
+            color: #333;
+            margin: 0;
+        }
+        .appointment-details p {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Appointment Confirmation</h1>
+        <p>Dear {{ patient.user.first_name }} {{ patient.user.last_name}},</p>
+        <p>Your appointment with Dr. {{doctor.user.first_name}} {{doctor.user.last_name}} has been successfully booked at HMS.</p>
+        <div class="appointment-details">
+            <h2>Appointment Details:</h2>
+            <p><strong>Date:</strong> {{ appoint.appointment_date }}</p>
+            <!-- <p><strong>Time:</strong> {{ appointment_time }}</p> -->
+            <p><strong>Location:</strong> HMS Hospital, near pusa road, New Delhi</p>
+        </div>
+        <p>We look forward to seeing you. If you have any questions or need to reschedule, please contact us at 8579485698.</p>
+        <p>Best regards,<br>HMS</p>
+    </div>
+</body>
+</html>

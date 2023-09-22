@@ -26,6 +26,9 @@ SECRET_KEY = 'kedn$)l(@hzib6w)^v=s@xnsk7r*8fr2ql$h(bwd+u+=%d31-&'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 
 # Application definition
@@ -40,12 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django_cookies_samesite.middleware.CookiesSameSite',
-    "django_samesite_none.middleware.SameSiteNoneMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,8 +57,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 ROOT_URLCONF = 'Management_System.urls'
+AUTH_USER_MODEL="Management_System.Custom_User"
 
 TEMPLATES = [
     {
@@ -74,7 +78,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'HMS.wsgi.application'
-AUTH_USER_MODEL="Management_System.Custom_User"
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -115,28 +118,34 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-SESSION_COOKIE_SECURE = True
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
-CORS_ORIGIN_ALLOW_ALL = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 MEDDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_URL = '/static/'
-CORS_ALLOW_CREDENTIALS=True
-SRF_COOKIE_SECURE = True
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+SESSION_COOKIE_SECURE = True
+DCS_SESSION_COOKIE_SAMESITE = 'None'
 SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE =True
-SESSION_COOKIE_SAMESITE =None
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'himan9506492198@gmail.com'
+EMAIL_HOST_PASSWORD ='delv ocin yqol jvgi'
