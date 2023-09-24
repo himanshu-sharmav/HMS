@@ -19,6 +19,8 @@ urlpatterns =[
      path('reject_appointment',views.reject_appointment,name='reject_appointment'),
      path('update_appointments',views.update_appointments,name='update_appointments'),
     path('prescription',views.prescription,name='prescription'),
+    path('Elements',views.navpane,name='Elements'),
+
 
 
 
