@@ -4,7 +4,7 @@ from django.db.models import Q
 # from Management_System import Custom_User
 # from django_renderpdf.views import helpers
 # from renderpdf import render
-# from weasyprint import HTML
+from weasyprint import HTML
 from django.core.mail import send_mail
 
 from django.template.loader import get_template
@@ -188,6 +188,7 @@ def book_appointment(request):
     doctor_id = request.POST.get('doctor_id')
     date=request.POST.get('appointment_date')
     medical_files=request.FILES.get('medical_files')
+    symptoms=request.POST.get('symptoms')
     print(doctor_id)
     if not doctor_id :
        return JsonResponse({'message':'Fill id'},status=403)
@@ -202,8 +203,9 @@ def book_appointment(request):
        patients=patient,
        Doctor=doctor,
        appointment_date=appointment_dates,
-       medical_files=medical_files
-       )
+       medical_files=medical_files,
+       symptoms=symptoms
+       ) 
     make_appointment.save()
     patients_payment=Patient.objects.get(userd=user)
     patients_payment.payment_history=True
@@ -246,7 +248,7 @@ def approve_appointment(request):
                 'appoint': appoints
              } 
              message=render_to_string(template_name,context) 
-             patient_email=[appoints.patients.user.email]
+             patient_email=[appoints.patients.userd.email]
              print(patient_email)
              send_mail('Appointment Confirmation','','himan9506492198@gmail.com',patient_email,html_message=message,fail_silently=False)
           return JsonResponse({'Confirmation':'Approved BY Doctor'})
@@ -382,9 +384,9 @@ def details_all(request):
   user=request.user
   if user.roles.filter(roles='Doctor').exists():
    # user_id=user.id
-   appoints=appointmentt.objects.filter(Doctor__user=user,approval_doctor=True)
+   appoints=appointmentt.objects.filter(Doctor__userd=user,approval_doctor=True)
    # docs_data = [model_to_dict(appointment) for appointment in docs_]
-   appointment_list = [{'id': appointment.id,'date': appointment.appointment_date.strftime('%Y-%m-%d'), 'is_approved': appointment.approval,'first_name':appointment.Doctor.user.first_name,'last_name':appointment.Doctor.user.last_name,'availability':appointment.Doctor.availability,'department':appointment.Doctor.doc.dep_name,'fees':appointment.Doctor.fees,'Pfname':appointment.patients.user.first_name,'Plname':appointment.patients.user.last_name,'Rejection':appointment.is_rejected } for appointment in appoints]
+   appointment_list = [{'id': appointment.id,'date': appointment.appointment_date.strftime('%Y-%m-%d'), 'is_approved': appointment.approval,'first_name':appointment.Doctor.userd.first_name,'last_name':appointment.Doctor.userd.last_name,'availability':appointment.Doctor.availability,'department':appointment.Doctor.doc.dep_name,'fees':appointment.Doctor.fees,'Pfname':appointment.patients.userd.first_name,'Plname':appointment.patients.userd.last_name,'Rejection':appointment.is_rejected,'Symptoms':appointment.symptoms } for appointment in appoints]
           
    return JsonResponse({'message':appointment_list})
   else: 
@@ -403,13 +405,7 @@ def get_details(request):
    try:
       patient=Patient.objects.get(userd=user)
       
-        
-  #  if patient:
-    #   patient_details=Patient.objects.get(user=user)
-      # patient_data = model_to_dict(patient, exclude=['prescription'])
-      # custom_user = Custom_User.objects.get(user=user)
-      # custom_user_data = model_to_dict(patient.user,exclude=['password','last_login',]) 
-      # user_data=model_to_dict(user.custom_user)
+ 
       patient_data={
          'id': patient.id,
          "height":patient.height,
@@ -457,17 +453,19 @@ def bill_view(request):
     if request.method == 'POST':
       # bill_Template='bill_template.html'
 
-      template_name = loader.get_template('billing_templates/bill_template.html')
+      template_name ='billing_templates/bill_template.html'
       # template_name = render_to_string('bill_template.html')
 
       # temp_n=get_template
       data=json.loads(request.body)
-      patient_id=data['patient_id']
-      doctor_id=data['doctor_id']
-
-      patient=Patient.objects.get(id=patient_id)
-      doctor=Doctor.objects.get(id=doctor_id)
-
+      appointment_id=data['appointment_id']
+      # patient_id=data['patient_id']
+      # doctor_id=data['doctor_id']
+      appointments=appointmentt.objects.get(id=appointment_id)
+      # patient=Patient.objects.filter(id=appointments.patients).first()
+      # doctor=Doctor.objects.filter(id=appointments.Doctor).first()
+      patient=appointments.patients
+      doctor=appointments.Doctor
       additional_costs=55
       total_amount=doctor.fees + additional_costs
       # html_content = Template.render(context)
@@ -481,19 +479,24 @@ def bill_view(request):
       # pdf= helpers.render_pdf(template=(template_name),file_='/home',context=context)
       # pdf = helpers.render_pdf(template=template_name,context=context,file_='/home')
 
-      # html_string = render_to_string(template_name, context, request=request)
+      html_string = render_to_string(template_name, context, request=request)
+      # html_string =  template_name.render(context)
+      # pdf = HTML(string=html_string).write_pdf()
+      # response = HttpResponse(pdf, content_type='application/pdf')
       # html = HTML(string=html_string)
       # pdf_file=pdf.write()
-
+      # response['Content-Disposition'] = 'attachment; filename="bill.pdf"'
+      # return response
 
       # pdf = render(request,template_name,context)
       # response= HttpResponse(pdf_file, content_type='application/pdf')
       # response['Content-Disposition'] = f'attachement; filename="bill.pdf"'
       # pdf_view=PDFView()
       
-      # response= HttpResponse(pdf, content_type='application/pdf')
-      # response['Content-Disposition'] = f'attachement; filename="bill.pdf"'
-      return HttpResponse(template_name.render(context,request))
+      response= HttpResponse(html_string, content_type='application/templates/pdf')
+      response['Content-Disposition'] = f'attachement; filename="bill.pdf"'
+      return response
+      # return HttpResponse(template_name.render(context,request))
       # return JsonResponse({'message  ': 'POST request received'})
 def department_details(request):
     if request.method == 'POST':
@@ -565,24 +568,32 @@ def prescription(request):
    if request.method=='GET':
       user=request.user
       appointments_id=request.GET.get('appointment_id')
-      appointments=appointmentt.objects.filter(patients__user=user,id=appointments_id).first()
+      appointments=appointmentt.objects.filter(patients__userd=user,id=appointments_id).first()
       # prescriptions = Prescription.objects.filter(patient_prs__patients__user=user)
       all_prescriptions = []
+      reports_all= []
 
       # for appoint in appointments:
                   #   Retrieve prescriptions associated with the current appointment
-      prescriptions = Prescription.objects.filter(patient_prs=appointments)
+      prescriptions = Prescription.objects.filter(patient_f=appointments)
 
       for prescription in prescriptions:
             prescription_data = {
                             'medicine': prescription.medicines,
                             'count': prescription.count,
                             'dosage': prescription.dosage,
-                            'appointment_id': prescription.patient_prs.id,
+                           #  'appointment_id': prescription.patient_f,
+                            'Report_name':prescription.Report_name,
+                            'status':prescription.Status
                         }
             all_prescriptions.append(prescription_data)
-
-      return JsonResponse(all_prescriptions, safe=False)
+      for reports in prescriptions:
+         reports_data = {
+                        'Report_name':reports.Report_name,
+                        'status':reports.Status
+         }
+         reports_all.append(reports_data)
+      return JsonResponse({'medicines':all_prescriptions,'report':reports_all})
        
                 
       
@@ -592,21 +603,31 @@ def prescription(request):
 
 
    if request.method=='POST':
-      data=json.loads(request.body)
-      appointment_id=data.get('appointment_id')
-      appointment_instance=appointmentt.objects.get(id=appointment_id)
-      if "data" in data and isinstance(data["data"], list):
-       prescription_data = data["data"]
-       for entry in prescription_data:
+       data=json.loads(request.body)
+       appointment_id=data.get('appointment_id')
+      # Report_name=
+       appointment_instance=appointmentt.objects.get(id=appointment_id)
+      # if "data" in data and isinstance(data["data"], list):
+       prescription_data1 = data["data1"]
+       prescription_data2 = data["data2"]
+      #  print(prescription_data1)
+      #  print(prescription_data2)
+
+       for entry in prescription_data1:
+          Report_name=entry.get('reportName')
+          status=entry.get('reportStatus')
+      
+       for entry in prescription_data2:
           medical_name = entry.get('medicalName')
           medical_quantity = entry.get('medicalQuantity')
           dosage=entry.get('dosage')
-            
 
           Prescription.objects.create(
-           patient_prs=appointment_instance,
+           patient_f=appointment_instance,
            medicines=medical_name,
            count=medical_quantity,
-           dosage=dosage
+           dosage=dosage,
+           Report_name=Report_name,
+           Status=status
            )
-      return JsonResponse({'message':'Prescription Details Saved'})
+       return JsonResponse({'message':'Prescription Details Saved'})
