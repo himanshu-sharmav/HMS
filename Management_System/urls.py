@@ -20,6 +20,9 @@ urlpatterns =[
      path('update_appointments',views.update_appointments,name='update_appointments'),
     path('prescription',views.prescription,name='prescription'),
     path('Elements',views.navpane,name='Elements'),
+    path('depart_count',views.depart_count,name='depart_count'),
+
+
 
 
 

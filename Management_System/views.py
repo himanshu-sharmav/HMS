@@ -2,16 +2,16 @@ from django.shortcuts import get_object_or_404
 from .models import Custom_User,Doctor,Patient,appointmentt,Department,Prescription,Navpane,User_Profile,Medical_Historyyy
 from django.db.models import Q
 # from Management_System import Custom_User
-# from django_renderpdf.views import helpers
+from django_renderpdf.views import helpers, PDFView
 # from renderpdf import render
-from weasyprint import HTML
+# from weasyprint import HTML
 from django.core.mail import send_mail
 
 from django.template.loader import get_template
 # from django.template import bill_template
-from django.template import loader
+# from django.template import loader
 # from reportlab.pdfgen import canvas
-from django.shortcuts import render
+# from django.shortcuts import render
 # import reprlib
 import datetime
 from django.template.loader import render_to_string
@@ -97,7 +97,7 @@ def register(request):
              )
             doctor_role = get_object_or_404(User_Profile, roles='Doctor')
             user.roles.add(doctor_role)
-            
+            departmentt = Department.objects.get(dep_name=department)
             # user_profile=  Custom_User.objects.create(user=user,is_doctor=True)
             Doctor.objects.create(
             userd=user,
@@ -106,7 +106,7 @@ def register(request):
             availability=availability,
             experience=experience,
             fees=fees,
-            department=department
+            doc=departmentt
             )
             # user.roles.add(User_Profile.objects.get_or_create(name='Doctor')[0])   
             return JsonResponse({'Confirm':'Doctor Registered'})
@@ -268,7 +268,8 @@ def approve_appointment(request):
 def reject_appointment(request):
     user=request.user
     if request.method=='POST':
-      if user.is_superuser or user.is_doctor:
+      if user.roles.filter(roles='Receptionist').exists() or user.roles.filter(roles='Doctor').exists():
+
         data=json.loads(request.body)
         appointmentid=data['appointment_id']
         reason=data['reason']
@@ -285,7 +286,7 @@ def reject_appointment(request):
            'appoint':appoint
         }
         message=render_to_string(template_name,context) 
-        patient_email=[appoint.patients.user.email]
+        patient_email=[appoint.patients.userd.email]
          
          
         send_mail('Appointment Rejection','','himan9506492198@gmail.com',patient_email,html_message=message,fail_silently=False)
@@ -450,20 +451,12 @@ def get_details(request):
  
 def bill_view(request):
    # user=request.user
-    if request.method == 'POST':
-      # bill_Template='bill_template.html'
-
-      template_name ='billing_templates/bill_template.html'
-      # template_name = render_to_string('bill_template.html')
-
-      # temp_n=get_template
-      data=json.loads(request.body)
-      appointment_id=data['appointment_id']
-      # patient_id=data['patient_id']
-      # doctor_id=data['doctor_id']
+    if request.method == 'GET':
+      
+      appointment_id=request.GET.get('appointment_id')
+      
       appointments=appointmentt.objects.get(id=appointment_id)
-      # patient=Patient.objects.filter(id=appointments.patients).first()
-      # doctor=Doctor.objects.filter(id=appointments.Doctor).first()
+      
       patient=appointments.patients
       doctor=appointments.Doctor
       additional_costs=55
@@ -475,37 +468,35 @@ def bill_view(request):
       'additional_costs':additional_costs,
       'total_amount': total_amount
       }
-      # pdf_view=PDFView()
-      # pdf= helpers.render_pdf(template=(template_name),file_='/home',context=context)
-      # pdf = helpers.render_pdf(template=template_name,context=context,file_='/home')
-
-      html_string = render_to_string(template_name, context, request=request)
-      # html_string =  template_name.render(context)
-      # pdf = HTML(string=html_string).write_pdf()
-      # response = HttpResponse(pdf, content_type='application/pdf')
-      # html = HTML(string=html_string)
-      # pdf_file=pdf.write()
-      # response['Content-Disposition'] = 'attachment; filename="bill.pdf"'
-      # return response
-
-      # pdf = render(request,template_name,context)
-      # response= HttpResponse(pdf_file, content_type='application/pdf')
-      # response['Content-Disposition'] = f'attachement; filename="bill.pdf"'
-      # pdf_view=PDFView()
       
-      response= HttpResponse(html_string, content_type='application/templates/pdf')
-      response['Content-Disposition'] = f'attachement; filename="bill.pdf"'
+      response = HttpResponse(content_type="application/pdf")
+      response['Content-Disposition'] = f'attachment; filename="bill.pdf"'
+
+
+      helpers.render_pdf(template=['bill_template.html'],file_=response,context=context)
+      
       return response
-      # return HttpResponse(template_name.render(context,request))
-      # return JsonResponse({'message  ': 'POST request received'})
+      
 def department_details(request):
+    if request.method =='GET':
+       approved_count= appointmentt.objects.filter(approval=True).count()
+       rejected_count=appointmentt.objects.filter(is_rejected=True).count()
+       pending_count=appointmentt.objects.filter(approval=False,is_rejected=False).count()
+
+       appointment_count= {
+          'Approved':approved_count,
+          'Rejected':rejected_count,
+          'Pending':pending_count
+       }
+
+       return JsonResponse(appointment_count)
     if request.method == 'POST':
         data = json.loads(request.body)
         dep_name = data.get('dep_name')
         updated_name = data.get('new_name')
         dep_id = data.get('dep_id')
 
-        if request.user.is_superuser:
+        if request.user.roles.filter(roles='Receptionist').exists():
             # if not dep_name:
             #     return JsonResponse({'message': 'Please provide department name'})
 
@@ -528,7 +519,8 @@ def department_details(request):
       dep_id = data.get('dep_id')
       if not dep_id:
             return JsonResponse({'message': 'Please provide department id'})
-      if request.user.is_superuser:
+      if request.user.roles.filter(roles='Receptionist').exists():
+
         details = Department.objects.filter(id=dep_id).first()
         if details:
             details.is_status = True
@@ -542,11 +534,11 @@ def navpane(request):
       
       if user.roles.filter(roles='Patient').exists():
 
-         rows=Navpane.objects.filter(worker_role='P')
+         rows=Navpane.objects.filter(worker_role='P').order_by('order')
       elif user.roles.filter(roles='Receptionist').exists():
-         rows=Navpane.objects.filter(worker_role='R')
+         rows=Navpane.objects.filter(worker_role='R').order_by('order')
       else:
-         rows=Navpane.objects.filter(worker_role='D')
+         rows=Navpane.objects.filter(worker_role='D').order_by('order')
 
       serialized_rows = [
             {
@@ -631,3 +623,17 @@ def prescription(request):
            Status=status
            )
        return JsonResponse({'message':'Prescription Details Saved'})
+   
+def depart_count(request):
+   if request.method=='GET':
+
+      departments=Department.objects.all()
+
+      department_info=[]
+
+      for department in departments:
+         doctor_count=Doctor.objects.filter(doc=department).count()
+         department_info.append({'department_name':department.dep_name,'doctor_count':doctor_count})
+
+      return JsonResponse(department_info,safe=False)   
+

@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Invoice</title>
-    </head>
-
-    <body>
-        <h1><center>Invoice</center></h1>
-        <p>Patient Name: {{ patient.user.first_name}} {{patient.user.last_name}}</p>
-        <p>Patient ID: {{patient.id}}</p>
-        <p>Doctor: {{doctor.user.first_name}} {{doctor.user.last_name}}</p>
-        <p>Doctor fees: ${{doctor.fees}}</p>
+<!-- {% extends 'base_bill_template.html' %} -->
+<!-- {% block content %} -->
+    <center style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">
+        <h1>Invoice</h1>
+        <p>Patient Name: {{ patient.userd.first_name }} {{ patient.userd.last_name }}</p>
+        <p>Patient ID: {{ patient.id }}</p>
+        <p>Doctor: {{ doctor.userd.first_name }} {{ doctor.userd.last_name }}</p>
+        <p>Doctor fees: ${{ doctor.fees }}</p>
         <p>Additional Costs: ${{ additional_costs }}</p>
         <p>Total Amount: ${{ total_amount }}</p>
-    </body>
-</html>
+    </center>
+<!-- {% endblock %} -->

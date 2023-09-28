@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Bill</title>
+</head>
+<body>
+    <style>
+        header {
+            text-align: left;
+        }
+        header img, header p, header h1{
+            display:inline;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        main {
+            margin-top: 150px;
+        }
+        hr {
+            border-top: 1px dashed #8c8b8b;
+        }
+        hr.a {
+            margin-top: 500px;
+        }
+        .f {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    </style>
+    <header>
+        <div>
+            <center>
+                <img src="/media/logo.png" alt="Hospital Logo" height="90px" width="100px"> 
+                <h1>HMS</h1>
+                <!-- <p>Address: Hospital Address</p> -->
+                <p style="font-size: small;"><i>Passion For Caring</i></p>
+            </center>
+        </div>
+        <hr size="6">
+    </header>
+    
+    <main>
+        <!-- {% block content %} -->
+        {% include 'billing_templates/bill_template.html' %}
+        <!-- {% endblock %} -->
+    </main>
+    
+    <hr size="6" class="a"></hr>
+    
+    <footer>
+        <div class="f">
+            <p>All disputes are subjected to Ghaziabad jurisdiction only<br> (Cheques Receipts are Subject to realization) </p>
+            <p>Address: HMS Hospital, near pusa road<br>NH-27 New Delhi  </p>  
+        </div>
+    </footer>
+</body>
+</html>

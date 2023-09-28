@@ -29,6 +29,11 @@ class Navpane(models.Model):
     button_name=models.TextField()
     delete_sign=models.BooleanField(null=True)
     worker_role=models.CharField(max_length=50,null=True)
+    order=models.PositiveIntegerField(default=0,null=True)
+    class Meta:
+        ordering= ['order']
+
+
 class Doctor(models.Model):
     userd =models.ForeignKey(Custom_User,on_delete=models.CASCADE,null=True)
     specialization=models.CharField(max_length=100)
@@ -36,7 +41,7 @@ class Doctor(models.Model):
     availability = models.TextField()
     experience = models.PositiveIntegerField()
     fees=models.DecimalField(max_digits=8,decimal_places=2)
-    department=models.CharField(max_length=50,default='Cardiologist')
+    # department=models.CharField(max_length=50,default='Cardiologist')
     doc=models.ForeignKey(Department,on_delete=models.CASCADE,null=True)
     # shared_navpane=models.ManyToManyField(Navpane,related_name='doctors',blank=True )
     
