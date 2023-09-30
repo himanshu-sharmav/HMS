@@ -680,7 +680,7 @@ def all_users_count(request):
 
    return JsonResponse({'doctor_count':doctor_count,'patient_count':patient_count})
 
-def appointment_chart(request):
+def doctor_dashboard_chart(request):
    user=request.user   
    doctor_appointments=appointmentt.objects.filter(Doctor__userd=user)
    approved_appointments=doctor_appointments.filter(approval=True).count()
@@ -695,5 +695,50 @@ def appointment_chart(request):
       'Female_patients':female_patients_count
       })
 
-# def gender_chart(request):/
+def blood_group_chart(request):
+   user=request.user
+   doctor_appointments=appointmentt.objects.filter(Doctor__userd=user)
+   # approved_appointments=doctor_appointments.filter(approval=True).count()
+   # reject_appointments=doctor_appointments.filter(is_rejected=True).count()
+
+   # A_plus = doctor_appointments.filter(patients__blood_group='A+').count()
+   # A_minus = doctor_appointments.filter(patients__blood_group='A-').count()
+   # B_plus = doctor_appointments.filter(patients__blood_group='B+').count()
+   # B_minus = doctor_appointments.filter(patients__blood_group='B-').count()
+   # AB_plus = doctor_appointments.filter(patients__blood_group='AB+').count()
+   # AB_minus = doctor_appointments.filter(patients__blood_group='AB-').count()
+   # O_plus = doctor_appointments.filter(patients__blood_group='O+').count()
+   # O_minus = doctor_appointments.filter(patients__blood_group='O-').count()
+   blood_groups=['A-','A+','B+','B-','AB+','AB-','O+','O-']
+   blood_group_counts = []
+
+   for blood_group in blood_groups:
+      count=doctor_appointments.filter(patients__blood_group=blood_group).count()
+      blood_group_counts.append({
+         'grp_name':blood_group,
+         'patient_count':count
+      })
+
+   return JsonResponse(blood_group_counts,safe=False)   
+
    
+def patient_chart(request):
+   user= request.user
+
+   patient_appointments=appointmentt.objects.filter(patients__userd=user)
+   approved_count=patient_appointments.filter(approval=True).count()
+   rejected_count=patient_appointments.filter(is_rejected=True).count()
+
+   approval_counts = [
+        {
+            'approval_status': 'approved',
+            'count': approved_count
+        },
+        {
+            'approval_status': 'Rejected',
+            'count': rejected_count
+        }
+    ]
+
+   return JsonResponse(approval_counts,safe=False)
+

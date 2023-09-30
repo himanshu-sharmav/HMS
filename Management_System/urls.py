@@ -22,7 +22,11 @@ urlpatterns =[
     path('Elements',views.navpane,name='Elements'),
     path('depart_count',views.depart_count,name='depart_count'),
     path('users_count',views.all_users_count,name='users_count'),
-    path('appointment_chart',views.appointment_chart,name='appointment_chart'),
+    path('doctor_chart',views.doctor_dashboard_chart,name='doctor_chart'),
+    path('blood_chart',views.blood_group_chart,name='blood_chart'),
+    path('patient_chart',views.patient_chart,name='patient_chart'),
+
+
 
 
 
