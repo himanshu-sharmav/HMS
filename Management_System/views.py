@@ -562,30 +562,42 @@ def prescription(request):
       if not appointments_id:
             return JsonResponse({'message': 'Please provide an appointment_id'}, status=400)
       
-      appointments=appointmentt.objects.filter(patients__userd=user,id=appointments_id).first()
-      # if not appointments:
-      #       return JsonResponse({'message': 'Appointment not found'}, status=404)
-      
-      all_prescriptions = []
-      reports_all= []
+      appointments=appointmentt.objects.filter(id=appointments_id).first()
+      if not appointments:
+            return JsonResponse({'message': 'Appointment not found'}, status=404)
+      is_doctor = user.roles.filter(roles='Doctor').exists()
 
-      prescriptions = Prescription.objects.filter(patient_f=appointments)
+      if is_doctor:
+         prescriptions = Prescription.objects.filter(patient_f=appointments, patient_f__Doctor__userd=user)
+      else:
+         prescriptions = Prescription.objects.filter(patient_f=appointments)
+
+      all_prescriptions = []
+      # reports_all= []
+      # if user.roles.filter(roles='Doctor').exists():
+
+
+      # else:
+      #    appointments=appointmentt.objects.filter(patients__userd=user,id=appointments_id).first()
+
+         # prescriptions = Prescription.objects.filter(patient_f=appointments)
 
       for prescription in prescriptions:
             prescription_data = {
                             'medicine': prescription.medicines,
                             'count': prescription.count,
                             'dosage': prescription.dosage,
-                           
+                            'Report_name':prescription.Report_name,
+                            'status':prescription.Status  
                         }
             all_prescriptions.append(prescription_data)
-      for reports in prescriptions:
-         reports_data = {
-                        'Report_name':reports.Report_name,
-                        'status':reports.Status
-         }
-         reports_all.append(reports_data)
-      return JsonResponse({'medicines':all_prescriptions,'report':reports_all})
+      # for reports in prescriptions:
+      #    reports_data = {
+      #                   'Report_name':reports.Report_name,
+      #                   'status':reports.Status
+      #    }
+         # reports_all.append(reports_data)
+      return JsonResponse({'medicines':all_prescriptions})
        
 
    elif request.method=='POST':

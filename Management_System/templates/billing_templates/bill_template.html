@@ -1,25 +1,6 @@
 {% extends 'billing_templates/base_bill_template.html' %}
 {% load static %}
 {% block content %}
-
-<!-- <center style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">
-    
-    <h1 style="margin-top: -100px; background-color: #080a08; padding: 10px; color: white;">Invoice</h1>
-  
-    <div style="display: flex; justify-content: space-between; ">
-        <div style="text-align: left; margin-top: 100px;" >
-            <p>Patient Name: {{ patient.userd.first_name }} {{ patient.userd.last_name }}</p>
-            <p>Patient ID: {{ patient.id }}</p>
-            <p>Doctor: {{ doctor.userd.first_name }} {{ doctor.userd.last_name }}</p>
-        </div>
-        <div style="text-align: right; margin-top: 100px;">
-            <p>Doctor fees: Rs{{ doctor.fees }}</p>
-            <p>Additional Costs: Rs{{ additional_costs }}</p>
-            <p>Total Amount: Rs{{ total_amount }}</p>
-        </div>
-    </div>
-</center> -->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,13 +9,13 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            /* background-color: bisque; */
+            background-color: #ecf0fa; 
         }
-        
+
         .invoice {
             width: 100%;
-            background-color:  #8515aa;
-            color: rgb(230, 228, 123);
+            background-color: #8515aa; 
+            color: #e6e47b; 
             text-align: center;
             padding: 10px;
             margin-top: -50px;
@@ -58,11 +39,11 @@
         th, td {
             padding: 8px;
             text-align: left;
-            border-bottom: 1px solid #904e8c;
+            border-bottom: 1px solid #904e8c; 
         }
 
         th {
-            background-color: #ecf0fa;
+            background-color: #d1c7ea; 
         }
 
         .total-amount {
@@ -70,8 +51,8 @@
             text-align: right; 
             font-weight: bold; 
             font-size: 18px;
-            color: #080a08; 
-            background-color: #7790d3;; 
+            color: #080a08;
+            background-color: #7790d3; 
             padding: 10px; 
         }
     </style>
@@ -112,8 +93,4 @@
     </div>
 </body>
 </html>
-
-
-
-
-    {% endblock %}
+{% endblock %}
