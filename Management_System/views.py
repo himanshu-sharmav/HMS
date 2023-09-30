@@ -686,5 +686,14 @@ def appointment_chart(request):
    approved_appointments=doctor_appointments.filter(approval=True).count()
    reject_appointments=doctor_appointments.filter(is_rejected=True).count()
 
-   return JsonResponse({'Approved_appointments':approved_appointments,'Rejected_appointments':reject_appointments})
+   male_patients_count = doctor_appointments.filter(patients__userd__sex='Male').count()
+   female_patients_count = doctor_appointments.filter(patients__userd__sex='Female').count()
+   return JsonResponse({
+      'Approved_appointments':approved_appointments,
+      'Rejected_appointments':reject_appointments,
+      'Male_patients':male_patients_count,
+      'Female_patients':female_patients_count
+      })
 
+# def gender_chart(request):/
+   
