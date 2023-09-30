@@ -219,6 +219,7 @@ def approve_appointment(request):
          
          return JsonResponse({'Confirmation':'Already Confirmed by Receiptionist'})
        elif doctor and user== appoints.Doctor.userd:
+        if appoints.approval_receiptionist: 
          if  appoints.approval_doctor==False: 
           appoints.approval_doctor=True
           appoints.save()
