@@ -671,11 +671,11 @@ def depart_count(request):
 
 def all_users_count(request):
 
-   all_info = []
+   # all_info = []
    
    doctor_count=Doctor.objects.all().count()
    patient_count=Patient.objects.all().count()
 
-   all_info.append({'doctor_count':doctor_count,'patient_count':patient_count})
+   # all_info.append({'doctor_count':doctor_count,'patient_count':patient_count})
 
-   return JsonResponse(all_info,safe=False)
+   return JsonResponse({'doctor_count':doctor_count,'patient_count':patient_count})
