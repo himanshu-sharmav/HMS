@@ -22,10 +22,7 @@ urlpatterns =[
     path('Elements',views.navpane,name='Elements'),
     path('depart_count',views.depart_count,name='depart_count'),
 
-
-
-
-
-
-
 ]
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

@@ -1,3 +1,4 @@
+<!-- {% load static %} -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,6 +6,14 @@
 </head>
 <body>
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        @page {
+            size:A4;
+            margin:0%;
+        }
         header {
             text-align: left;
         }
@@ -21,18 +30,19 @@
             border-top: 1px dashed #8c8b8b;
         }
         hr.a {
-            margin-top: 500px;
+            margin-top: 300px;
         }
         .f {
             display: flex;
             flex-direction: row;
             justify-content: space-between;
+            margin-bottom: -100px;
         }
     </style>
     <header>
         <div>
             <center>
-                <img src="/media/logo.png" alt="Hospital Logo" height="90px" width="100px"> 
+                <!-- <img src="/media/logo.png" alt="Hospital Logo" height="90px" width="100px">  -->
                 <h1>HMS</h1>
                 <!-- <p>Address: Hospital Address</p> -->
                 <p style="font-size: small;"><i>Passion For Caring</i></p>
@@ -42,9 +52,10 @@
     </header>
     
     <main>
-        <!-- {% block content %} -->
+       {% block content %}
         {% include 'billing_templates/bill_template.html' %}
-        <!-- {% endblock %} -->
+        {% endblock %}
+        
     </main>
     
     <hr size="6" class="a"></hr>

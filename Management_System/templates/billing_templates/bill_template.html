@@ -1,12 +1,119 @@
-<!-- {% extends 'base_bill_template.html' %} -->
-<!-- {% block content %} -->
-    <center style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">
+{% extends 'billing_templates/base_bill_template.html' %}
+{% load static %}
+{% block content %}
+
+<!-- <center style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">
+    
+    <h1 style="margin-top: -100px; background-color: #080a08; padding: 10px; color: white;">Invoice</h1>
+  
+    <div style="display: flex; justify-content: space-between; ">
+        <div style="text-align: left; margin-top: 100px;" >
+            <p>Patient Name: {{ patient.userd.first_name }} {{ patient.userd.last_name }}</p>
+            <p>Patient ID: {{ patient.id }}</p>
+            <p>Doctor: {{ doctor.userd.first_name }} {{ doctor.userd.last_name }}</p>
+        </div>
+        <div style="text-align: right; margin-top: 100px;">
+            <p>Doctor fees: Rs{{ doctor.fees }}</p>
+            <p>Additional Costs: Rs{{ additional_costs }}</p>
+            <p>Total Amount: Rs{{ total_amount }}</p>
+        </div>
+    </div>
+</center> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* background-color: bisque; */
+        }
+        
+        .invoice {
+            width: 100%;
+            background-color:  #7790d3;
+            color: rgb(61, 229, 14);
+            text-align: center;
+            padding: 10px;
+            margin-top: -50px;
+        }
+
+        .content {
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .patient-info {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #dea759;
+        }
+
+        th {
+            background-color: #dea759;
+        }
+
+        .total-amount {
+            margin-top: 20px;
+            text-align: right; 
+            font-weight: bold; 
+            font-size: 18px;
+            color: #080a08; 
+            background-color: #be84d2; 
+            padding: 10px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice">
         <h1>Invoice</h1>
-        <p>Patient Name: {{ patient.userd.first_name }} {{ patient.userd.last_name }}</p>
-        <p>Patient ID: {{ patient.id }}</p>
-        <p>Doctor: {{ doctor.userd.first_name }} {{ doctor.userd.last_name }}</p>
-        <p>Doctor fees: ${{ doctor.fees }}</p>
-        <p>Additional Costs: ${{ additional_costs }}</p>
-        <p>Total Amount: ${{ total_amount }}</p>
-    </center>
-<!-- {% endblock %} -->
+    </div>
+    
+    <div class="content">
+        <div class="patient-info">
+            <p>Patient Name: {{ patient.userd.first_name }} {{ patient.userd.last_name }}</p>
+            <p>Patient ID: {{ patient.id }}</p>
+            <p>Doctor: {{ doctor.userd.first_name }} {{ doctor.userd.last_name }}</p>
+        </div>
+    
+        <table>
+            <tr>
+                <th>Item</th>
+                <!-- <th>Quantity</th> -->
+                <th>Price</th>
+            </tr>
+            <tr>
+                <td>Doctor Fees</td>
+                <!-- <td>1</td> -->
+                <td>Rs{{ doctor.fees }}</td>
+            </tr>
+            <tr>
+                <td>Additional Costs</td>
+                <!-- <td>2</td> -->
+                <td>Rs{{ additional_costs }}</td>
+            </tr>
+        </table>
+        
+        <div class="total-amount">
+            Total Amount: Rs{{ total_amount }}
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+    {% endblock %}
