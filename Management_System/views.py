@@ -565,9 +565,10 @@ def prescription(request):
       appointments=appointmentt.objects.filter(id=appointments_id).first()
       if not appointments:
             return JsonResponse({'message': 'Appointment not found'}, status=404)
-      is_doctor = user.roles.filter(roles='Doctor').exists()
+      user.roles.filter(roles='Doctor').exists()
 
-      if is_doctor:
+      if user.roles.filter(roles='Doctor').exists():
+      
          prescriptions = Prescription.objects.filter(patient_f=appointments, patient_f__Doctor__userd=user)
       else:
          prescriptions = Prescription.objects.filter(patient_f=appointments)

@@ -1,34 +1,33 @@
-<!-- {% load static %} -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Hospital Bill</title>
-</head>
-<body>
     <style>
         body {
             margin: 0;
             padding: 0;
+            background-color: #ecf0fa; /* Light purple background */
         }
         @page {
-            size:A4;
-            margin:0%;
+            size: A4;
+            margin: 0%;
         }
         header {
             text-align: left;
-            background-color:  #4f63b4;
+            background-color: #f0daf7; /* Dark purple header background */
+            color: #4144e3; /* Yellow text color */
         }
         header p, header h1{
-            display:inline;
+            display: inline;
             vertical-align: middle;
             margin-right: 10px;
         }
-
         main {
             margin-top: 120px;
         }
         hr {
-            border-top: 1px dashed #2c2a2a;
+            border-top: 1px dashed #2c2a2a; /* Dark purple dashed line */
         }
         hr.a {
             margin-top: 300px;
@@ -39,7 +38,15 @@
             justify-content: space-between;
             margin-bottom: -300px;
         }
+        footer {
+            background-color: #ecf0fa; /* Light purple background */
+            padding: 10px;
+            color: #c24553; /* Dark purple text color */
+            text-align: center;
+        }
     </style>
+</head>
+<body>
     <header>
         <div>
             <center>
@@ -56,7 +63,6 @@
        {% block content %}
         {% include 'billing_templates/bill_template.html' %}
         {% endblock %}
-        
     </main>
     
     <hr size="6" class="a"></hr>
