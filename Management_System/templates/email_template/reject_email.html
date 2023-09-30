@@ -62,14 +62,14 @@
     <div class="container">
         <h1>Appointment Rejection</h1>
         <p>Dear {{ patient.user.first_name}} {{patient.user.last_name}},</p>
-        <p>We regret to inform you that your appointment with Dr. {{ doctor.user.first_name}} {{ doctor.user.last_name}} at HMS has been rejected.</p>
+        <p>We regret to inform you that your appointment with Dr. {{ doctor.user.first_name}} {{ doctor.user.last_name}} at HMS has been rejected and your money has been refunded.</p>
         <div class="appointment-details">
             <h2>Appointment Details:</h2>
             <p><strong>Date:</strong> {{ appoint.appointment_date }}</p>
             <!-- <p><strong>Time:</strong> [Appointment Time]</p> -->
             <p><strong>Location:</strong> HMS Hospital, near pusa road,Delhi</p>
         </div>
-        <p>If you have any questions or need further assistance, please contact us at [Hospital Contact].</p>
+        <p>If you have any questions or need further assistance, please contact us at 5874898652.</p>
         <p>Best regards,<br>HMS</p>
     </div>
 </body>

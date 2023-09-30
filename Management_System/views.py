@@ -261,7 +261,9 @@ def reject_appointment(request):
                 return JsonResponse({'message': 'Appointment not found'}, status=404)
 
         appoint.is_rejected=True
+        appoint.approval_receiptionist=True
         appoint.reasons=reason
+        appoint.patients.payment_history=False
         appoint.save()
         
         template_name='email_template/reject_email.html'
@@ -300,6 +302,20 @@ def update_appointments(request):
        appointment_instance.save()
       # if medical_files:
       #    appointment_instance.medical_files=medical_files
+      template_name='email_template/update_email.html'
+      
+      context={
+           'patient':appointment_instance.patients,
+           'doctor':appointment_instance.Doctor,
+           'appoint':appointment_instance
+        }
+      
+      message=render_to_string(template_name,context) 
+      patient_email=[appointment_instance.patients.userd.email]
+
+      send_mail('Appointment Update','','himan9506492198@gmail.com',patient_email,html_message=message,fail_silently=False)
+
+
       return JsonResponse({'message':'Appointment Date has been updated'})    
    
    return JsonResponse({'message': 'Method not allowed'}, status=405)  
@@ -317,7 +333,7 @@ def show_appointments(request):
    else:
        appoints = appointmentt.objects.filter(Q(patients__userd=user))
 
-   appointment_list = [{'id': appointment.id,'date': appointment.appointment_date.strftime('%Y-%m-%d'), 'is_approved': appointment.approval,'first_name':appointment.Doctor.userd.first_name,'last_name':appointment.Doctor.userd.last_name,'availability':appointment.Doctor.availability,'department':appointment.Doctor.doc.dep_name,'fees':appointment.Doctor.fees,'Pfname':appointment.patients.userd.first_name,'Plname':appointment.patients.userd.last_name,'Rejection':appointment.is_rejected,'Symptoms':appointment.symptoms } for appointment in appoints]
+   appointment_list = [{'id': appointment.id,'date': appointment.appointment_date.strftime('%Y-%m-%d'), 'is_approved': appointment.approval,'first_name':appointment.Doctor.userd.first_name,'last_name':appointment.Doctor.userd.last_name,'availability':appointment.Doctor.availability,'department':appointment.Doctor.doc.dep_name,'fees':appointment.Doctor.fees,'Pfname':appointment.patients.userd.first_name,'Plname':appointment.patients.userd.last_name,'Rejection':appointment.is_rejected,'Symptoms':appointment.symptoms,'Receptionist':appointment.approval_receiptionist } for appointment in appoints]
 
    return JsonResponse({'message': appointment_list})
 
@@ -652,3 +668,14 @@ def depart_count(request):
 
    else:
         return JsonResponse({'message': 'Invalid request method'}, status=405)
+
+def all_users_count(request):
+
+   all_info = []
+   
+   doctor_count=Doctor.objects.all().count()
+   patient_count=Patient.objects.all().count()
+
+   all_info.append({'doctor_count':doctor_count,'patient_count':patient_count})
+
+   return JsonResponse(all_info,safe=False)

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Appointment Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color:  #ecf0fa;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #7790d3;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Appointment Update</h1>
+        <p>Dear {{ patient.userd.first_name }} {{ patient.userd.last_name}}<p>
+        <p>Your appointment with Dr. {{doctor.userd.first_name}} {{doctor.userd.last_name}} has been updated.</p>
+        <p>New Appointment Details:</p>
+        <ul>
+            <li>Date and Time: {{ appoint.appointment_date }}</li>
+            <li><strong>Location:</strong> HMS Hospital, near pusa road,Delhi</li>
+        </ul>
+        <p>If you have any questions or need further assistance, please feel free to contact us.</p>
+        <p>Thank you for choosing our services.</p>
+        <p>Sincerely,</p>
+        <p>The HMS Team</p>
+        
+    </div>
+</body>
+</html>

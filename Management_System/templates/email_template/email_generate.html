@@ -46,8 +46,8 @@
 <body>
     <div class="container">
         <h1>Appointment Confirmation</h1>
-        <p>Dear {{ patient.user.first_name }} {{ patient.user.last_name}},</p>
-        <p>Your appointment with Dr. {{doctor.user.first_name}} {{doctor.user.last_name}} has been successfully booked at HMS.</p>
+        <p>Dear {{ patient.userd.first_name }} {{ patient.userd.last_name}},</p>
+        <p>Your appointment with Dr. {{doctor.userd.first_name}} {{doctor.userd.last_name}} has been successfully booked at HMS.</p>
         <div class="appointment-details">
             <h2>Appointment Details:</h2>
             <p><strong>Date:</strong> {{ appoint.appointment_date }}</p>

@@ -21,6 +21,8 @@ urlpatterns =[
     path('prescription',views.prescription,name='prescription'),
     path('Elements',views.navpane,name='Elements'),
     path('depart_count',views.depart_count,name='depart_count'),
+    path('users_count',views.all_users_count,name='users_count'),
+
 
 ]
 # if settings.DEBUG:
