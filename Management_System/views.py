@@ -679,3 +679,12 @@ def all_users_count(request):
    # all_info.append({'doctor_count':doctor_count,'patient_count':patient_count})
 
    return JsonResponse({'doctor_count':doctor_count,'patient_count':patient_count})
+
+def appointment_chart(request):
+   user=request.user   
+   doctor_appointments=appointmentt.objects.filter(Doctor__userd=user)
+   approved_appointments=doctor_appointments.filter(approval=True).count()
+   reject_appointments=doctor_appointments.filter(is_rejected=True).count()
+
+   return JsonResponse({'Approved_appointments':approved_appointments,'Rejected_appointments':reject_appointments})
+
