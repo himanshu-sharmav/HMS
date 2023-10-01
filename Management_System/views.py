@@ -83,8 +83,8 @@ def register(request):
              address=address,
              date_of_birth=date_of_birth,
              )
-            # doctor_role = get_object_or_404(User_Profile, roles='Doctor')
-            # user.roles.add(doctor_role)
+            doctor_role = get_object_or_404(User_Profile, roles='Doctor')
+            user.roles.add(doctor_role)
             departmentt = Department.objects.get(dep_name=department)
             Doctor.objects.create(
             userd=user,
