@@ -70,7 +70,7 @@ def register(request):
                return JsonResponse({'message':'Fill all fields'})
 
             if Custom_User.objects.filter(email=email).exists():
-                return JsonResponse({'message':'Jhoola Chaap Doctor'})
+                return JsonResponse({'message':'User already exits'})
 
             user=Custom_User.objects.create_user(
              username=username,
@@ -95,7 +95,7 @@ def register(request):
             fees=fees,
             doc=departmentt
             )  
-            return JsonResponse({'Confirm':'Doctor Registered'},status=201)
+            return JsonResponse({'message':'Doctor Registered'},status=201)
         elif user_type=='Patient':
             height=data['height']
             weight=data['weight']
@@ -104,7 +104,11 @@ def register(request):
             if not height or not weight or not blood_group:
                return JsonResponse({'message':'Fill all fields for patients'},status=400)
             
+            
             if Custom_User.objects.filter(email=email).exists():
+               custom_details=Custom_User.objects.filter(email=email)
+               if custom_details.roles.filter(roles='Doctor').exists():
+                  pass
                return JsonResponse({'message': 'A user with this email already exists'}, status=400)
 
             user=Custom_User.objects.create_user(
@@ -127,7 +131,7 @@ def register(request):
                 weight=weight,
                 blood_group=blood_group
             )
-            return JsonResponse({'Confirm':'Patient Registered'},status=201)
+            return JsonResponse({'message':'Patient Registered'},status=201)
         else:
             return JsonResponse({'message':'Please send user type'},status=400)
     
@@ -136,6 +140,13 @@ def register(request):
         return JsonResponse({'message':'wrong method'},status=405)
     
 def login_view(request):
+     if request.method == 'GET':
+        user=request.user
+        if user.is_authenticated:
+            roles=[role.roles for role in user.roles.all()] 
+            return JsonResponse({'message': roles})
+        return JsonResponse({'message':'User not authenticated'})
+           
      if request.method == 'POST':
         data = json.loads(request.body)
         username = data['username']
@@ -147,9 +158,9 @@ def login_view(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-              
+               #  custom_role=request.user.custom_user_roles  
                 roles=[role.roles for role in user.roles.all()] 
-               
+               #  if roles.delete_sign==False:  
                 return JsonResponse({'message': roles})
                
             else:
@@ -180,10 +191,10 @@ def book_appointment(request):
       
     doctor=Doctor.objects.get(pk=doctor_id)
     if not doctor:
-      return JsonResponse({'message': 'Doctor not found'}, status=404)
+      return JsonResponse({'message': 'Doctor not found'}, status=204)
     patient = Patient.objects.get(userd=user)
     if not patient:
-      return JsonResponse({'message': 'Patient not found'}, status=404)
+      return JsonResponse({'message': 'Patient not found'}, status=204)
     make_appointment=appointmentt(
        patients=patient,
        Doctor=doctor,
@@ -211,7 +222,7 @@ def approve_appointment(request):
        appoints=appointmentt.objects.get(id=appointmentid) 
       
        if not appoints:
-            return JsonResponse({'message': 'Appointment not found'}, status=404)
+            return JsonResponse({'message': 'Appointment not found'}, status=204)
       
        doctor=Doctor.objects.filter(userd=user).first()
 
@@ -266,7 +277,7 @@ def reject_appointment(request):
         
         appoint=appointmentt.objects.get(pk=appointmentid)
         if not appoint:
-                return JsonResponse({'message': 'Appointment not found'}, status=404)
+                return JsonResponse({'message': 'Appointment not found'}, status=204)
         if appoint.is_rejected==False:   
          appoint.is_rejected=True
          appoint.approval_receiptionist=True
@@ -623,7 +634,7 @@ def prescription(request):
       
       appointments=appointmentt.objects.filter(id=appointments_id).first()
       if not appointments:
-            return JsonResponse({'message': 'Appointment not found'}, status=404)
+            return JsonResponse({'message': 'Appointment not found'}, status=204)
       user.roles.filter(roles='Doctor').exists()
 
       if user.roles.filter(roles='Doctor').exists():
@@ -668,7 +679,7 @@ def prescription(request):
        
        appointment_instance=appointmentt.objects.get(id=appointment_id)
        if not appointment_instance:
-            return JsonResponse({'message': 'Appointment not found'}, status=404)
+            return JsonResponse({'message': 'Appointment not found'}, status=204)
   
        prescription_data1 = data["data1"]
        prescription_data2 = data["data2"]
