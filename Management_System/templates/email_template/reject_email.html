@@ -61,10 +61,10 @@
 <body>
     <div class="container">
         <h1>Appointment Rejection</h1>
-        <p>Dear {{ patient.user.first_name}} {{patient.user.last_name}},</p>
-        <p>We regret to inform you that your appointment with Dr. {{ doctor.user.first_name}} {{ doctor.user.last_name}} at HMS has been rejected and your money has been refunded.</p>
+        <p>Dear {{ patient.userd.first_name}} {{patient.userd.last_name}},</p>
+        <p>We regret to inform you that your appointment with Dr. {{ doctor.userd.first_name}} {{ doctor.userd.last_name}} at HMS has been rejected and your money has been refunded.</p>
         <div class="appointment-details">
-            <h2>Appointment Details:</h2>
+            <h2>Rejected Appointment Details:</h2>
             <p><strong>Date:</strong> {{ appoint.appointment_date }}</p>
             <!-- <p><strong>Time:</strong> [Appointment Time]</p> -->
             <p><strong>Location:</strong> HMS Hospital, near pusa road,Delhi</p>

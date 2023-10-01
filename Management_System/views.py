@@ -50,6 +50,8 @@ def register(request):
            return JsonResponse({"message":"Fill the date of birth"})
         if not username:
            return JsonResponse({"message":"Fill the username"})
+        if not user_type:
+           return JsonResponse({"message":"Fill the user_type"})
        
            
         if user_type=='Doctor':  
@@ -60,7 +62,10 @@ def register(request):
             fees=data['fees']
             department=data['department']
 
-            
+            departmentt = Department.objects.get(dep_name=department)
+            if not departmentt:
+               return JsonResponse({'message':'Department not exist'})
+
             if not specialization or not qualifications or not availability or not experience or not fees or not department:
                return JsonResponse({'message':'Fill all fields'})
 
@@ -78,8 +83,8 @@ def register(request):
              address=address,
              date_of_birth=date_of_birth,
              )
-            doctor_role = get_object_or_404(User_Profile, roles='Doctor')
-            user.roles.add(doctor_role)
+            # doctor_role = get_object_or_404(User_Profile, roles='Doctor')
+            # user.roles.add(doctor_role)
             departmentt = Department.objects.get(dep_name=department)
             Doctor.objects.create(
             userd=user,
@@ -165,7 +170,7 @@ def book_appointment(request):
     date=request.POST.get('appointment_date')
     medical_files=request.FILES.get('medical_files')
     symptoms=request.POST.get('symptoms')
-    print(doctor_id)
+   
     if not doctor_id :
        return JsonResponse({'message':'Fill the doctor id'},status=400)
     if not date:
@@ -217,7 +222,7 @@ def approve_appointment(request):
            appoints.save()
            return JsonResponse({'Confirmation':'Approved BY Receiptionist'})
          
-         return JsonResponse({'Confirmation':'Already Confirmed by Receiptionist'})
+         return JsonResponse({'Confirmation':'Already Approved by Receiptionist'})
        elif doctor and user== appoints.Doctor.userd:
         if appoints.approval_receiptionist: 
          if  appoints.approval_doctor==False: 
@@ -238,9 +243,11 @@ def approve_appointment(request):
              print(patient_email)
              send_mail('Appointment Confirmation','','himan9506492198@gmail.com',patient_email,html_message=message,fail_silently=False)
           return JsonResponse({'Confirmation':'Approved BY Doctor'})
-        
+         
          return JsonResponse({'Confirmation':'Already Confirmed by Doctor'})
-       
+        
+        return JsonResponse({'Confirmation':'Not Approved By Receptionist'})
+        
        return JsonResponse({'message':'Not authorized to approve'},status=403)
     
     return JsonResponse({'message': 'Wrong method'}, status=405) 
@@ -260,41 +267,44 @@ def reject_appointment(request):
         appoint=appointmentt.objects.get(pk=appointmentid)
         if not appoint:
                 return JsonResponse({'message': 'Appointment not found'}, status=404)
-
-        appoint.is_rejected=True
-        appoint.approval_receiptionist=True
-        appoint.reasons=reason
-        appoint.patients.payment_history=False
-        appoint.save()
-        
-        template_name='email_template/reject_email.html'
-        context={
-           'patient':appoint.patients,
-           'doctor':appoint.Doctor,
-           'appoint':appoint
-        }
-        message=render_to_string(template_name,context) 
-        patient_email=[appoint.patients.userd.email]
+        if appoint.is_rejected==False:   
+         appoint.is_rejected=True
+         appoint.approval_receiptionist=True
+         appoint.reasons=reason
+         appoint.patients.payment_history=False
+         appoint.save()
          
-         
-        send_mail('Appointment Rejection','','himan9506492198@gmail.com',patient_email,html_message=message,fail_silently=False)
-
-        return JsonResponse({'message':'Appointment Rejected'})
-
+         template_name='email_template/reject_email.html'
+         context={
+            'patient':appoint.patients,
+            'doctor':appoint.Doctor,
+            'appoint':appoint
+         }
+         message=render_to_string(template_name,context) 
+         patient_email=[appoint.patients.userd.email]
+          
+          
+         send_mail('Appointment Rejection','','himan9506492198@gmail.com',patient_email,html_message=message,fail_silently=False)
+ 
+         return JsonResponse({'message':'Appointment Rejected'})
+        return JsonResponse({'message':'Appointment already Rejected. Kindly Refresh the Page.'}) 
       return JsonResponse({'message':'Not authorized to do this action'},status=403)  
 
     return JsonResponse({'message': 'Wrong method'}, status=405) 
     
 def update_appointments(request):
-   user=request.user
+   # user=request.user
    if request.method=='POST':
       data=json.loads(request.body)
       appointment_id=data['appointment_id']
       updated_date=data['updated_date']
       # medical_files=request.FILES.get('medical_files')
+      
       if not appointment_id or not updated_date:
          return JsonResponse({'message':'Fill all fields'},status=400)  
+      
       appointment_instance=appointmentt.objects.get(id=appointment_id)
+      
       if not appointment_instance:
          return JsonResponse({'message': 'Appointment not found'}, status=404)
 
@@ -334,7 +344,22 @@ def show_appointments(request):
    else:
        appoints = appointmentt.objects.filter(Q(patients__userd=user))
 
-   appointment_list = [{'id': appointment.id,'date': appointment.appointment_date.strftime('%Y-%m-%d'), 'is_approved': appointment.approval,'first_name':appointment.Doctor.userd.first_name,'last_name':appointment.Doctor.userd.last_name,'availability':appointment.Doctor.availability,'department':appointment.Doctor.doc.dep_name,'fees':appointment.Doctor.fees,'Pfname':appointment.patients.userd.first_name,'Plname':appointment.patients.userd.last_name,'Rejection':appointment.is_rejected,'Symptoms':appointment.symptoms,'Receptionist':appointment.approval_receiptionist } for appointment in appoints]
+   appointment_list = [{'id': appointment.id,
+                        'date': appointment.appointment_date.strftime('%Y-%m-%d'), 
+                        'is_approved': appointment.approval,
+                        'first_name':appointment.Doctor.userd.first_name,
+                        'last_name':appointment.Doctor.userd.last_name,
+                        'availability':appointment.Doctor.availability,
+                        'department':appointment.Doctor.doc.dep_name,
+                        'fees':appointment.Doctor.fees,
+                        'Pfname':appointment.patients.userd.first_name,
+                        'Plname':appointment.patients.userd.last_name,
+                        'Rejection':appointment.is_rejected,
+                        'Symptoms':appointment.symptoms,
+                        'Receptionist':appointment.approval_receiptionist 
+                        } 
+                        for appointment in appoints
+                        ]
 
    return JsonResponse({'message': appointment_list})
 
@@ -399,7 +424,21 @@ def details_all(request):
      
      appoints=appointmentt.objects.filter(Doctor__userd=user,approval_doctor=True)
      
-     appointment_list = [{'id': appointment.id,'date': appointment.appointment_date.strftime('%Y-%m-%d'), 'is_approved': appointment.approval,'first_name':appointment.Doctor.userd.first_name,'last_name':appointment.Doctor.userd.last_name,'availability':appointment.Doctor.availability,'department':appointment.Doctor.doc.dep_name,'fees':appointment.Doctor.fees,'Pfname':appointment.patients.userd.first_name,'Plname':appointment.patients.userd.last_name,'Rejection':appointment.is_rejected,'Symptoms':appointment.symptoms } for appointment in appoints]
+     appointment_list = [{'id': appointment.id,
+                          'date': appointment.appointment_date.strftime('%Y-%m-%d'), 
+                          'is_approved': appointment.approval,
+                          'first_name':appointment.Doctor.userd.first_name,
+                          'last_name':appointment.Doctor.userd.last_name,
+                          'availability':appointment.Doctor.availability,
+                          'department':appointment.Doctor.doc.dep_name,
+                          'fees':appointment.Doctor.fees,
+                          'Pfname':appointment.patients.userd.first_name,
+                          'Plname':appointment.patients.userd.last_name,
+                          'Rejection':appointment.is_rejected,
+                          'Symptoms':appointment.symptoms 
+                          } 
+                          for appointment in appoints
+                          ]
             
      return JsonResponse({'message':appointment_list})
     
@@ -423,7 +462,9 @@ def get_details(request):
       doctor_details = Doctor.objects.all().values('userd__first_name','userd__last_name','userd__sex','specialization','qualifications','experience','availability','doc__dep_name')
       patient_details=Patient.objects.all().values('userd__first_name','userd__last_name','blood_group','height','weight','userd__sex','userd__email','userd__contact')
       return JsonResponse({'doctor':list(doctor_details),'patients':list(patient_details)})
-   try:
+   
+   elif user.roles.filter(roles='Patient').exists():
+
       patient=Patient.objects.get(userd=user)
       
  
@@ -450,7 +491,8 @@ def get_details(request):
    
       return JsonResponse({'patient':combined_data})
   
-   except Patient.DoesNotExist:
+   elif user.roles.filter(roles='Doctor').exists():
+
       doctor_details=Doctor.objects.filter(userd=user).first()
       if doctor_details:
          excluded_details=['fees','availability','specialization']
@@ -459,7 +501,7 @@ def get_details(request):
          department_name=doctor_details.doc.dep_name
          combined_data = {**doctor_data, **custom_data,'department_name':department_name}
          return JsonResponse({'doctor':combined_data})
-      else:
+   else:
         return JsonResponse({'message':'user role not recognised'})
   else:
      return JsonResponse({'message':'user is not authenticated'})
@@ -699,17 +741,6 @@ def doctor_dashboard_chart(request):
 def blood_group_chart(request):
    user=request.user
    doctor_appointments=appointmentt.objects.filter(Doctor__userd=user)
-   # approved_appointments=doctor_appointments.filter(approval=True).count()
-   # reject_appointments=doctor_appointments.filter(is_rejected=True).count()
-
-   # A_plus = doctor_appointments.filter(patients__blood_group='A+').count()
-   # A_minus = doctor_appointments.filter(patients__blood_group='A-').count()
-   # B_plus = doctor_appointments.filter(patients__blood_group='B+').count()
-   # B_minus = doctor_appointments.filter(patients__blood_group='B-').count()
-   # AB_plus = doctor_appointments.filter(patients__blood_group='AB+').count()
-   # AB_minus = doctor_appointments.filter(patients__blood_group='AB-').count()
-   # O_plus = doctor_appointments.filter(patients__blood_group='O+').count()
-   # O_minus = doctor_appointments.filter(patients__blood_group='O-').count()
    blood_groups=['A-','A+','B+','B-','AB+','AB-','O+','O-']
    blood_group_counts = []
 
