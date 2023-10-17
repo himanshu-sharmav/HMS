@@ -1,14 +1,5 @@
 # HMS
-this is a hms project
-TechStack Used
-mysqlclient==2.1.1
-Pillow==9.5.0
-Django==2.2
-django-cookies-samesite==0.9.0
-django-cors-headers==2.5.1
-django-renderpdf==3.0.0
-django-sslserver==0.22
-python version =3.7.1
+This is a hms project
 
 Hospital Management System (HMS)
 
