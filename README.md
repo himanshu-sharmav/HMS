@@ -1,9 +1,9 @@
 # HMS
-This is a hms project
+This is the backend for hms project
 
 Hospital Management System (HMS)
 
-HMS is a web application built with Django for managing appointments, patient records, and more in a hospital or medical facility.
+HMS is a web application whose backend is built with Django for managing appointments, patient records, and more in a hospital or medical facility.
 Installation
 
 
